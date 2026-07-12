@@ -330,7 +330,7 @@ Each post builds on the last. You do not need Docker until Post 3.
 | **1 (this post)** | A Test Fidelity Ladder | Concepts, vocabulary, eShop intro |
 | **2** | Repository Mock + EF InMemory | Bottom two ladder rungs — repository fake vs EF InMemory |
 | **3** | Testcontainers | Docker-backed dependencies; Postgres/pgvector case study |
-| **4** | Aspire in tests | `WebApplicationFactory` + `DistributedApplication` hybrid |
+| **4** | Aspire in tests | Hybrid WAF + `DistributedApplication`, Identity.API, resource control |
 | **5** | EventBus & outbox | Spy bus vs real RabbitMQ, outbox assertions |
 | **6 (optional)** | Benchmarks | When to use which mode in CI |
 

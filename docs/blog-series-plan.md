@@ -79,14 +79,12 @@ Publish in order. Each post stands alone but links forward and back.
 - **Draft:** see `docs/post-3-testcontainers.md`.
 
 ### Post 4 — Full-stack fidelity (Aspire in tests)
-**Title:** *Using .NET Aspire Inside API Tests — WebApplicationFactory Meets DistributedApplication*
-- The hybrid: WAF hosts the API; Aspire hosts the dependencies.
-- What Aspire gives tests: Postgres (+ RabbitMQ), health waits, connection strings.
-- What Aspire in tests does **not** replace (testing lens only).
-- In Action: `CatalogAspireTestHost`, `WaitForResourceHealthyAsync`.
-- Mode attribute + xUnit traits + `.runsettings`.
-- Workflow: mock locally, Aspire in CI nightly.
-- **Avoid** the Docker Compose vs Aspire essay (already covered); one "see also" link only.
+**Title:** *Building API Integration Tests in .NET — Aspire on the Fidelity Ladder*
+- Two Aspire testing shapes: full AppHost (`DistributedApplicationTestingBuilder`) vs eShop hybrid (WAF + `DistributedApplication`).
+- In Action: `CatalogAspireTestHost`, `OrderingAspireTestHost`, health waits, Identity.API `AddProject`.
+- Managing resources before startup — optional deps, failure injection, chaos patterns ([Testing overview](https://aspire.dev/testing/overview/), [Advanced scenarios](https://aspire.dev/testing/advanced-scenarios/)).
+- Mode attribute + xUnit traits + `.runsettings`. Workflow: mock locally, Aspire in CI nightly.
+- **Draft:** see `docs/post-4-aspire.md`.
 
 ### Post 5 — Messaging & outbox (advanced)
 **Title:** *Testing EventBus and the Transactional Outbox in .NET — Spy Bus vs Real RabbitMQ*
@@ -165,6 +163,7 @@ References
 | `docs/post-1-fidelity-ladder.md` | Post 1 full draft |
 | `docs/post-2-mock-and-inmemory.md` | Post 2 full draft |
 | `docs/post-3-testcontainers.md` | Post 3 full draft |
+| `docs/post-4-aspire.md` | Post 4 full draft |
 | `docs/code-snippets-per-post.md` | Copy-paste-ready snippets per post |
 | Screenshots: Test Explorer traits, Aspire dashboard in a test run, Docker containers | Visual proof |
 | Benchmark script (`dotnet test` × 4 runsettings, timed) | Post 7 |
