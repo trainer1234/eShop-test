@@ -22,7 +22,7 @@
 ## Table of Contents
 
 1. [Introduction](#1-introduction)
-2. [A quick review from Posts 1–3](#2-a-quick-review-from-posts-13)
+2. [A quick review — Testcontainers' place on the ladder](#2-a-quick-review--testcontainers-place-on-the-ladder)
 3. [What is Aspire?](#3-what-is-aspire)
 4. [Two ways to use Aspire in tests](#4-two-ways-to-use-aspire-in-tests)
 5. [When to climb to this rung](#5-when-to-climb-to-this-rung)
@@ -30,14 +30,14 @@
 7. [In Action: Catalog and Ordering Aspire hosts](#7-in-action-catalog-and-ordering-aspire-hosts)
 8. [Managing resources before startup](#8-managing-resources-before-startup)
 9. [Running, traits, and workflow](#9-running-traits-and-workflow)
-10. [Final act: Conclusion](#10-final-act-conclusion)
+10. [Conclusion](#10-conclusion)
 11. [References](#11-references)
 
 ---
 
 ## 1. Introduction
 
-[Post 3](post-3-testcontainers.md) climbed the ladder with **Testcontainers** — imperative Docker containers you start and wire yourself. That works well for one or two dependencies. It gets repetitive when your test topology mirrors a development AppHost: multiple databases, a message broker, and a sibling .NET service like Identity.API.
+[The Testcontainers article](post-3-testcontainers.md) climbed the ladder with **Testcontainers** — imperative Docker containers you start and wire yourself. That works well for one or two dependencies. It gets repetitive when your test topology mirrors a development AppHost: multiple databases, a message broker, and a sibling .NET service like Identity.API.
 
 The fourth rung adds **Aspire orchestration inside the test fixture** — declarative resources, built-in health notifications, and connection strings from the hosting layer.
 
@@ -46,11 +46,11 @@ The fourth rung adds **Aspire orchestration inside the test fixture** — declar
 | **Aspire (in tests)** | Resource graph, health waits, `AddProject` for live services | Full closed-box AppHost testing (optional separate style) |
 | **Testcontainers** | Direct control per container | Manual orchestration for multi-service graphs |
 
-**Prerequisites:** Docker running (same as Post 3). Section 3 summarizes Aspire for readers new to the topic; deeper introductions are in [References](#11-references).
+**Prerequisites:** Docker running (same as [Testcontainers](post-3-testcontainers.md)). Section 3 summarizes Aspire for readers new to the topic; deeper introductions are in [References](#11-references).
 
 ---
 
-## 2. A quick review from Posts 1–3
+## 2. A quick review — Testcontainers' place on the ladder
 
 | Concept | Summary |
 |---------|---------|
@@ -127,7 +127,7 @@ var response = await httpClient.GetAsync("/health");
 
 ### B — Open-box hybrid: `WebApplicationFactory` + `DistributedApplication` (eShop)
 
-eShop uses a **hybrid** aligned with Posts 1–3:
+The demo app uses a **hybrid** aligned with the [series introduction](post-1-fidelity-ladder.md) through [Testcontainers](post-3-testcontainers.md):
 
 ```
 Test project → WebApplicationFactory (Catalog.API / Ordering.API in-process)
@@ -154,7 +154,7 @@ This series implements **B** in the demo repo. **A** is the path to grow toward 
 - **Multiple dependencies** wired together — Ordering needs Postgres **and** a live Identity token endpoint.
 - **Health coordination** — wait until resources are healthy before HTTP assertions, without hand-written retry loops on every container.
 - **Team already uses Aspire in development** — test fixtures reuse familiar `AddPostgres`, `AddRabbitMQ`, `AddProject`, `WithReference` vocabulary.
-- **Messaging tests** (Post 5) — RabbitMQ alongside Postgres in the same Aspire host.
+- **Messaging tests** ([messaging article](post-5-messaging.md)) — RabbitMQ alongside Postgres in the same Aspire host.
 
 ### Blind spots
 
@@ -192,13 +192,13 @@ End-to-end flow for Catalog Aspire mode:
 
 Ordering adds **IdentityDB** + **Identity.API** as Aspire projects; the fixture injects `Identity:Url` from the running Identity endpoint.
 
-The API under test never runs as an Aspire `AddProject` — that is intentional (see Post 1 / hybrid rationale): keep `ConfigureTestServices` and in-process debugging.
+The API under test never runs as an Aspire `AddProject` — that is intentional (see [hybrid rationale in the introduction](post-1-fidelity-ladder.md)): keep `ConfigureTestServices` and in-process debugging.
 
 ---
 
 ## 7. In Action: Catalog and Ordering Aspire hosts
 
-### Catalog — Postgres (+ optional RabbitMQ for Post 5)
+### Catalog — Postgres (+ optional RabbitMQ for messaging tests)
 
 ```csharp
 public CatalogAspireTestHost(Assembly testAssembly, bool includeRabbitMq = false)
@@ -275,7 +275,7 @@ public sealed class OrderingApiTests(OrderingApiTestSession session) { ... }
 
 `CatalogApiTestSession` lazily creates one fixture per mode — Aspire cold start is paid once per test run, not per test method.
 
-Aspire mode still uses `ConfigureSharedExternalDependencies` for Catalog/Ordering API tests — fake AI, no-op messaging — unless you switch to messaging modes in Post 5.
+Aspire mode still uses `ConfigureSharedExternalDependencies` for Catalog/Ordering API tests — fake AI, no-op messaging — unless you switch to [messaging modes](post-5-messaging.md).
 
 ---
 
@@ -366,15 +366,15 @@ dotnet test tests/Catalog.FunctionalTests --settings eShop.FunctionalTests.Aspir
 dotnet test tests/Ordering.FunctionalTests --filter-trait FunctionalTestMode=aspire
 ```
 
-Trait values: `aspire`, `aspire-messaging-outbox`, `aspire-messaging-rabbitmq` (Post 5).
+Trait values: `aspire`, `aspire-messaging-outbox`, `aspire-messaging-rabbitmq` (see [messaging article](post-5-messaging.md)).
 
 ### Suggested workflow
 
 | When | Mode |
 |------|------|
-| Local edit loop | Repository Mock or EF InMemory (Post 2) |
-| PR validation — SQL | Testcontainers subset (Post 3) |
-| Nightly / pre-release | Aspire (+ messaging traits in Post 5) |
+| Local edit loop | [Repository Mock or EF InMemory](post-2-mock-and-inmemory.md) |
+| PR validation — SQL | [Testcontainers](post-3-testcontainers.md) subset |
+| Nightly / pre-release | Aspire (+ [messaging](post-5-messaging.md) traits) |
 | Resilience / chaos experiments | Aspire with resource manipulation (Section 8), separate job |
 
 Enable the Aspire dashboard during a failing local run by setting `DisableDashboard = false` in `DistributedApplicationOptions` — useful when a resource never reaches healthy state.
@@ -390,16 +390,14 @@ Enable the Aspire dashboard during a failing local run by setting `DisableDashbo
 
 ---
 
-## 10. Final act: Conclusion
+## 10. Conclusion
 
 Aspire on the fidelity ladder is **orchestration for test dependencies** — not a replacement for `WebApplicationFactory` in the eShop hybrid, and not the same as running your entire AppHost under `DistributedApplicationTestingBuilder`.
 
-- **Testcontainers (Post 3):** imperative containers, maximum control per image.
-- **Aspire (this post):** coordinated resources, health waits, live sibling services — with optional **pre-start manipulation** for failure and chaos scenarios documented by Microsoft.
+- **[Testcontainers](post-3-testcontainers.md):** imperative containers, maximum control per image.
+- **Aspire (this article):** coordinated resources, health waits, live sibling services — with optional **pre-start manipulation** for failure and chaos scenarios documented by Microsoft.
 
-Post 5 stays on this rung and adds **messaging fidelity** — outbox assertions with a spy bus or real RabbitMQ in the same Aspire host.
-
-**Final question:** does your AppHost topology fit in a single Testcontainers helper — or do you need Aspire's graph (and possibly resource manipulation) to test it honestly?
+The [messaging article](post-5-messaging.md) stays on this rung and adds **messaging fidelity** — outbox assertions with a spy bus or real RabbitMQ in the same Aspire host.
 
 ---
 
@@ -407,9 +405,9 @@ Post 5 stays on this rung and adds **messaging fidelity** — outbox assertions 
 
 **This series**
 
-- [Post 1 — A Test Fidelity Ladder](post-1-fidelity-ladder.md)
-- [Post 2 — Repository Mock and EF InMemory](post-2-mock-and-inmemory.md)
-- [Post 3 — Testcontainers](post-3-testcontainers.md)
+- [A Test Fidelity Ladder](post-1-fidelity-ladder.md) — series introduction
+- [Repository Mock and EF InMemory](post-2-mock-and-inmemory.md) — bottom two rungs
+- [Testcontainers on the Fidelity Ladder](post-3-testcontainers.md) — real database in Docker
 - `docs/multi-mode-functional-testing.md` — fixture architecture
 
 **Demo repo**

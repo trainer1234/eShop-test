@@ -22,7 +22,7 @@
 ## Table of Contents
 
 1. [Introduction](#1-introduction)
-2. [A quick review from Posts 1–2](#2-a-quick-review-from-posts-12)
+2. [A quick review — mock and InMemory](#2-a-quick-review--mock-and-inmemory)
 3. [What is Testcontainers?](#3-what-is-testcontainers)
 4. [What can you containerize?](#4-what-can-you-containerize)
 5. [When to climb to this rung](#5-when-to-climb-to-this-rung)
@@ -32,21 +32,21 @@
 9. [Shared fixture vs per-test isolation](#9-shared-fixture-vs-per-test-isolation)
 10. [Composing multiple containers](#10-composing-multiple-containers)
 11. [Running locally and in CI](#11-running-locally-and-in-ci)
-12. [Final act: Conclusion](#12-final-act-conclusion)
+12. [Conclusion](#12-conclusion)
 13. [References](#13-references)
 
 ---
 
 ## 1. Introduction
 
-[Post 2](post-2-mock-and-inmemory.md) left us on the second rung of the [fidelity ladder](post-1-fidelity-ladder.md): production repository code against in-process substitutes — an in-memory fake or EF Core InMemory. That catches handler and LINQ bugs, but not how your app behaves against **real external infrastructure**.
+[The mock and InMemory article](post-2-mock-and-inmemory.md) left us on the second rung of the [fidelity ladder](post-1-fidelity-ladder.md): production repository code against in-process substitutes — an in-memory fake or EF Core InMemory. That catches handler and LINQ bugs, but not how your app behaves against **real external infrastructure**.
 
 The third rung swaps those substitutes for **throwaway Docker containers** started from test code: databases, message brokers, caches, emulators — anything your system depends on that can run as an image.
 
 | Rung | What you gain | What you still defer |
 |------|---------------|----------------------|
 | **Testcontainers** | Real behavior of containerized dependencies you wire in | Coordinated multi-service graphs, live .NET sibling APIs |
-| Posts 1–2 | Fast feedback without Docker | Anything that only exists in a real broker, DB, or cache process |
+| Mock and InMemory | Fast feedback without Docker | Anything that only exists in a real broker, DB, or cache process |
 
 **This post uses PostgreSQL as the worked example** because eShop Catalog needs it — including pgvector for semantic search. The same fixture pattern applies if your next dependency is RabbitMQ, Redis, or Azurite; Section 4 maps common options.
 
@@ -54,7 +54,7 @@ The third rung swaps those substitutes for **throwaway Docker containers** start
 
 ---
 
-## 2. A quick review from Posts 1–2
+## 2. A quick review — mock and InMemory
 
 | Concept | Summary |
 |---------|---------|
@@ -80,7 +80,7 @@ The lifecycle is always the same:
 
 No manual `docker run`. No checked-in `docker-compose.yml` dedicated to tests. No shared "team Postgres" on localhost that every developer must install and keep in sync.
 
-Testcontainers is **not** a test framework. It does not replace xUnit or `WebApplicationFactory`. It is **infrastructure glue**: real dependencies on demand, wired into the integration test host from Posts 1–2.
+Testcontainers is **not** a test framework. It does not replace xUnit or `WebApplicationFactory`. It is **infrastructure glue**: real dependencies on demand, wired into the integration test host from the [series introduction](post-1-fidelity-ladder.md) and [mock/InMemory article](post-2-mock-and-inmemory.md).
 
 ---
 
@@ -97,7 +97,7 @@ Testcontainers for .NET ships modules for many common dependencies. The eShop de
 | **Elasticsearch / OpenSearch** | Community or generic modules | Index mappings, search queries |
 | **Custom service** | `ContainerBuilder` with your Dockerfile | Any image you can build |
 
-You are not limited to one container per fixture. A test host can start Postgres **and** RabbitMQ **and** Redis in `InitializeAsync`, inject three connection strings, and wait for each to become healthy — you write that orchestration (or wrap it in a shared library). Post 5 shows messaging with Aspire; the same RabbitMQ image could be started with Testcontainers instead.
+You are not limited to one container per fixture. A test host can start Postgres **and** RabbitMQ **and** Redis in `InitializeAsync`, inject three connection strings, and wait for each to become healthy — you write that orchestration (or wrap it in a shared library). The [messaging article](post-5-messaging.md) shows messaging with Aspire; the same RabbitMQ image could be started with Testcontainers instead.
 
 **eShop in this post:** Catalog needs **PostgreSQL with pgvector** — a Postgres extension for vector similarity search. That is why the case study below picks `ankane/pgvector`, not because Testcontainers is database-only.
 
@@ -107,7 +107,7 @@ You are not limited to one container per fixture. A test host can start Postgres
 
 ### When to use it
 
-- A **substitute from Post 2** cannot model the protocol or provider you need — InMemory EF does not speak PostgreSQL; a no-op `IEventBus` does not exercise AMQP.
+- A **substitute from the InMemory article** cannot model the protocol or provider you need — InMemory EF does not speak PostgreSQL; a no-op `IEventBus` does not exercise AMQP.
 - **Provider-specific behavior** matters: SQL extensions, broker acknowledgements, cache eviction, storage API quirks.
 - CI should hit **real infrastructure** without adopting Aspire in the test project.
 - You want **isolation** — each run gets fresh containers instead of shared dev services.
@@ -115,10 +115,10 @@ You are not limited to one container per fixture. A test host can start Postgres
 ### Blind spots
 
 - **Cold start** — first run pulls images; expect roughly 10–30 seconds before tests execute (warm runs are faster).
-- **You own orchestration** — startup order, health waits, and wiring multiple containers are your code. Post 4 introduces Aspire when standardizing that graph is worth the extra packages.
+- **You own orchestration** — startup order, health waits, and wiring multiple containers are your code. The [Aspire article](post-4-aspire.md) introduces Aspire when standardizing that graph is worth the extra packages.
 - **Not everything is container-shaped** — some teams depend on managed cloud APIs (real S3, Azure OpenAI) where emulators or contract tests are a better fit than Testcontainers alone.
 
-### What changes from Post 2 (Catalog example)
+### What changes from the InMemory rung (Catalog example)
 
 | Piece | EF InMemory mode | Testcontainers mode |
 |-------|------------------|----------------------|
@@ -131,11 +131,11 @@ You are not limited to one container per fixture. A test host can start Postgres
 
 ## 6. Testcontainers vs Aspire in tests
 
-Both rungs use Docker. The difference is **who owns the orchestration layer** (see [Post 1, Section 6](post-1-fidelity-ladder.md#6-the-test-fidelity-ladder)).
+Both rungs use Docker. The difference is **who owns the orchestration layer** (see [the series introduction, Section 6](post-1-fidelity-ladder.md#6-the-test-fidelity-ladder)).
 
 **Testcontainers** starts each dependency imperatively and injects addresses into configuration. Wrap that in a reusable helper — eShop's `CatalogTestcontainersHost` is ~30 lines for one Postgres instance. Scales to many container types; **you** connect them.
 
-**Aspire in tests** (Post 4) provides a declarative resource graph, built-in health waits, and `AddProject` for live .NET sibling services. Worth it when your app already uses Aspire in development and tests need several wired dependencies with less custom glue.
+**Aspire in tests** ([next article](post-4-aspire.md)) provides a declarative resource graph, built-in health waits, and `AddProject` for live .NET sibling services. Worth it when your app already uses Aspire in development and tests need several wired dependencies with less custom glue.
 
 Neither replaces `WebApplicationFactory` for the API under test. Both replace **what sits behind it**.
 
@@ -241,7 +241,7 @@ case CatalogFunctionalTestMode.Testcontainers:
 
 ### Keep non-DB deps as doubles (for now)
 
-Catalog Testcontainers mode still uses `FakeCatalogAI` and no-op event services — **only persistence is containerized** in this mode. Adding a `RabbitMqBuilder` alongside Postgres would follow the same inject-and-configure steps; Post 5 covers messaging in depth via Aspire.
+Catalog Testcontainers mode still uses `FakeCatalogAI` and no-op event services — **only persistence is containerized** in this mode. Adding a `RabbitMqBuilder` alongside Postgres would follow the same inject-and-configure steps; the [messaging article](post-5-messaging.md) covers messaging in depth via Aspire.
 
 ### Migrate, seed, and run the same tests
 
@@ -250,7 +250,7 @@ await context.Database.MigrateAsync();
 await seeder.SeedAsync(context);
 ```
 
-Annotate the test class (or override via runsettings) and run the same `CatalogApiTests` as in Posts 1–2 — pagination, create, update, delete. Persistence helpers read through `LoadItemFromPostgresAsync` when verifying writes. Testcontainers and Aspire share that path; only the connection string source differs.
+Annotate the test class (or override via runsettings) and run the same `CatalogApiTests` as in [mock and InMemory modes](post-2-mock-and-inmemory.md) — pagination, create, update, delete. Persistence helpers read through `LoadItemFromPostgresAsync` when verifying writes. Testcontainers and Aspire share that path; only the connection string source differs.
 
 > **Optional reading — pgvector and semantic search**  
 > Skip this block if you do not use vector search. It explains why eShop picks the `ankane/pgvector` image and how to test embedding ranking once the basics above are clear.
@@ -270,7 +270,7 @@ public Task<List<CatalogItem>> GetItemsBySemanticRelevanceAsync(
         .ToListAsync(cancellationToken);
 ```
 
-Under Testcontainers, that `CosineDistance` call becomes provider SQL. Under EF InMemory, the property is ignored entirely (Post 2).
+Under Testcontainers, that `CosineDistance` call becomes provider SQL. Under EF InMemory, the property is ignored entirely ([InMemory article](post-2-mock-and-inmemory.md)).
 
 #### Existing test: semantic search endpoint (name fallback today)
 
@@ -393,7 +393,7 @@ Testcontainers shines when you need **more than one dependency** without Aspire:
 | Distributed cache | `RedisBuilder` | `ConnectionStrings:Redis` or options type |
 | Identity data (without live API) | Second `PostgreSqlBuilder` | Separate connection string |
 
-`OrderingTestcontainersHost` today starts one standard Postgres database — same imperative pattern, no pgvector. Identity is still mocked; Aspire mode (Post 4) adds a live Identity.API **project** alongside databases.
+`OrderingTestcontainersHost` today starts one standard Postgres database — same imperative pattern, no pgvector. Identity is still mocked; the [Aspire article](post-4-aspire.md) adds a live Identity.API **project** alongside databases.
 
 To add RabbitMQ with Testcontainers in your own fork:
 
@@ -455,15 +455,13 @@ jobs:
 
 ---
 
-## 12. Final act: Conclusion
+## 12. Conclusion
 
 Testcontainers is the **first ladder rung that runs real infrastructure in Docker** — not only databases. The integration pattern is stable: start containers in the fixture, inject addresses into configuration, keep `WebApplicationFactory` and HTTP tests unchanged.
 
 eShop demonstrates that pattern with **PostgreSQL and pgvector** because Catalog semantic search demands it. Your application might start with Redis, RabbitMQ, or SQL Server instead; the fixture shape stays the same.
 
-Stay on Posts 1–2 for fast local loops. Climb here when substitutes stop answering your question. Climb to **Aspire** (Post 4) when orchestrating many dependencies — including live .NET services — should not be hand-written glue.
-
-**Final question:** which dependency in your system is still mocked in tests but only shows its real behavior against a live process — a broker, a database, a cache, or something else?
+Stay on [mock and InMemory](post-2-mock-and-inmemory.md) for fast local loops. Climb here when substitutes stop answering your question. Climb to **[Aspire](post-4-aspire.md)** when orchestrating many dependencies — including live .NET services — should not be hand-written glue.
 
 ---
 
@@ -471,8 +469,8 @@ Stay on Posts 1–2 for fast local loops. Climb here when substitutes stop answe
 
 **This series**
 
-- [Post 1 — A Test Fidelity Ladder](post-1-fidelity-ladder.md)
-- [Post 2 — Repository Mock and EF InMemory](post-2-mock-and-inmemory.md)
+- [A Test Fidelity Ladder](post-1-fidelity-ladder.md) — series introduction
+- [Repository Mock and EF InMemory](post-2-mock-and-inmemory.md) — bottom two rungs
 - `docs/code-snippets-per-post.md` — copy-paste snippets
 - `docs/multi-mode-functional-testing.md` — fixture architecture
 

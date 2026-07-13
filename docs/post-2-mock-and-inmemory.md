@@ -22,21 +22,21 @@
 ## Table of Contents
 
 1. [Introduction](#1-introduction)
-2. [A quick review from Post 1](#2-a-quick-review-from-post-1)
+2. [A quick review — the series introduction](#2-a-quick-review--the-series-introduction)
 3. [Two no-Docker rungs at a glance](#3-two-no-docker-rungs-at-a-glance)
 4. [Repository Mock — fake persistence, real API pipeline](#4-repository-mock--fake-persistence-real-api-pipeline)
 5. [EF Core InMemory — real repository, fake database](#5-ef-core-inmemory--real-repository-fake-database)
 6. [In Action: the same test, two levels of fidelity](#6-in-action-the-same-test-two-levels-of-fidelity)
 7. [Choosing between them](#7-choosing-between-them)
 8. [Running from CLI and Visual Studio](#8-running-from-cli-and-visual-studio)
-9. [Final act: Conclusion](#9-final-act-conclusion)
+9. [Conclusion](#9-conclusion)
 10. [References](#10-references)
 
 ---
 
 ## 1. Introduction
 
-In [Post 1](post-1-fidelity-ladder.md), we introduced the **test fidelity ladder** — a way to run the same API integration tests at different levels of realism. This post climbs the **bottom two rungs**.
+In [the series introduction](post-1-fidelity-ladder.md), we introduced the **test fidelity ladder** — a way to run the same API integration tests at different levels of realism. This article climbs the **bottom two rungs**.
 
 That matters more than it sounds. If integration tests only run in CI with containers, developers skip them locally. Green PRs ship with untested HTTP paths. The ladder only works when the fast rungs are genuinely fast — and these two require no Docker.
 
@@ -49,12 +49,12 @@ Same host. Same HTTP tests. Different answer to the question: *"How much of the 
 
 ---
 
-## 2. A quick review from Post 1
+## 2. A quick review — the series introduction
 
 | Term | Summary |
 |------|---------|
 | **API integration test** | Host the real app, send HTTP, assert on response and side effects |
-| **Stub / mock / fake / test double** | Replacements for production dependencies — Moq/NSubstitute mocks verify interactions; fakes provide working behavior (see [Post 1, Section 3](post-1-fidelity-ladder.md#3-stub-mock-fake--and-why-the-word-mock-confuses-everyone)) |
+| **Stub / mock / fake / test double** | Replacements for production dependencies — Moq/NSubstitute mocks verify interactions; fakes provide working behavior (see [the series introduction, Section 3](post-1-fidelity-ladder.md#3-stub-mock-fake--and-why-the-word-mock-confuses-everyone)) |
 | **Integration test host** | Real pipeline with a side door to swap dependencies via DI |
 | **`WebApplicationFactory`** | The built-in .NET type that provides that host in-process |
 | **Test fidelity ladder** | Climb from fast substitutes toward production-like infrastructure as your question demands more realism |
@@ -107,7 +107,7 @@ If that is still fresh, skip ahead to [Section 3](#3-two-no-docker-rungs-at-a-gl
 
 ### Why not Moq or NSubstitute?
 
-[Post 1](post-1-fidelity-ladder.md) drew the vocabulary line: in a **unit test**, a mock (Moq, NSubstitute) stubs one dependency and verifies an interaction — *"was `SaveChangesAsync` called once?"* In **Repository Mock mode**, we use a **fake** — a working in-memory implementation of `ICatalogRepository`, not a generated proxy.
+[The series introduction](post-1-fidelity-ladder.md) drew the vocabulary line: in a **unit test**, a mock (Moq, NSubstitute) stubs one dependency and verifies an interaction — *"was `SaveChangesAsync` called once?"* In **Repository Mock mode**, we use a **fake** — a working in-memory implementation of `ICatalogRepository`, not a generated proxy.
 
 That distinction matters because an API integration test hosts the **real pipeline**:
 
@@ -124,7 +124,7 @@ A **fake** answers a different question: *given realistic in-memory behavior, do
 | Moq/NSubstitute on `ICatalogRepository` | One interface call from a handler you invoke directly | `Received(1).SaveChangesAsync()` |
 | Repository fake via `WebApplicationFactory` | HTTP through to an in-memory store | `PUT /api/catalog/items` → `200 OK` + item persisted |
 
-Use Moq and NSubstitute in unit tests. Use fakes (or real implementations with substituted infrastructure) behind `WebApplicationFactory`. Post 1's rule still applies: *an API integration test is not "call the handler with a mocked `DbContext`."*
+Use Moq and NSubstitute in unit tests. Use fakes (or real implementations with substituted infrastructure) behind `WebApplicationFactory`. The introduction's rule still applies: *an API integration test is not "call the handler with a mocked `DbContext`."*
 
 ### Step 1 — Extract a repository abstraction (production)
 
@@ -259,7 +259,7 @@ EF Core InMemory is a **database provider** that stores entities in memory insid
 
 It is **not** a faithful PostgreSQL simulator. Microsoft explicitly recommends against using it to test behaviors that depend on a relational database — constraints, transactions, raw SQL, and provider-specific types will diverge.
 
-Catalog.API uses **semantic search**: product text is converted into an **embedding** (a numeric vector) and stored in PostgreSQL using the **pgvector** extension — a database feature for similarity search over vectors. EF Core InMemory knows nothing about `vector` columns, so it cannot validate that part of the stack. Use InMemory when repository logic is the question. Climb to Testcontainers (Post 3) when PostgreSQL semantics are.
+Catalog.API uses **semantic search**: product text is converted into an **embedding** (a numeric vector) and stored in PostgreSQL using the **pgvector** extension — a database feature for similarity search over vectors. EF Core InMemory knows nothing about `vector` columns, so it cannot validate that part of the stack. Use InMemory when repository logic is the question. Climb to [Testcontainers](post-3-testcontainers.md) when PostgreSQL semantics are.
 
 ### Step 1 — Make `CatalogContext` substitutable
 
@@ -287,7 +287,7 @@ internal sealed class InMemoryCatalogContext : CatalogContext
 }
 ```
 
-Semantic search endpoints still run in this mode (via `FakeCatalogAI`), but vector storage and `CosineDistance` queries are out of scope until Post 3.
+Semantic search endpoints still run in this mode (via `FakeCatalogAI`), but vector storage and `CosineDistance` queries are out of scope until the [Testcontainers article](post-3-testcontainers.md).
 
 ### Step 2 — Register InMemory provider + production repository
 
@@ -398,7 +398,7 @@ Run it twice — swap the attribute or runsettings file — and compare failure 
 |----------|------------|
 | Endpoint refactor, DTO mapping, validation rules | **Repository Mock** |
 | Pagination/filter LINQ in `CatalogRepository` | **EF Core InMemory** |
-| pgvector semantic search correctness | **Testcontainers** (Post 3) |
+| pgvector semantic search correctness | **[Testcontainers](post-3-testcontainers.md)** |
 | PR gate on a laptop without Docker | **Both** — Mock for breadth, InMemory for repository-heavy changes |
 | CI only runs containers | Still add Mock/InMemory targets for local dev; see optional benchmark post |
 
@@ -420,7 +420,7 @@ Run it twice — swap the attribute or runsettings file — and compare failure 
 | Catches EF mapping mistakes | Not PostgreSQL — no pgvector, no real constraints |
 | Same DI shape as Testcontainers/Aspire modes | InMemory transaction semantics differ from relational DB |
 
-**Rule of thumb:** Mock answers *"Does the API behave correctly?"* InMemory answers *"Does our repository code behave correctly?"* When staging breaks on SQL, climb to Post 3.
+**Rule of thumb:** Mock answers *"Does the API behave correctly?"* InMemory answers *"Does our repository code behave correctly?"* When staging breaks on SQL, climb to [Testcontainers](post-3-testcontainers.md).
 
 ---
 
@@ -466,7 +466,7 @@ No Docker daemon required for either command.
 
 ---
 
-## 9. Final act: Conclusion
+## 9. Conclusion
 
 The bottom two ladder rungs are not interchangeable — they answer different questions at the same speed tier.
 
@@ -475,9 +475,7 @@ The bottom two ladder rungs are not interchangeable — they answer different qu
 
 Both use `WebApplicationFactory`, `ConfigureTestServices`, and the same `CatalogApiTests` class. The fixture's mode switch is the only difference.
 
-When InMemory passes but staging breaks on PostgreSQL semantics — pgvector, migrations, constraint violations — it is time to climb to **Testcontainers**. That is Post 3.
-
-**Final question:** for your last three bugs, would Repository Mock have caught them, or did you need repository code — or real SQL?
+When InMemory passes but staging breaks on PostgreSQL semantics — pgvector, migrations, constraint violations — it is time to climb to **Testcontainers**. That is the [next article](post-3-testcontainers.md).
 
 ---
 
@@ -485,8 +483,8 @@ When InMemory passes but staging breaks on PostgreSQL semantics — pgvector, mi
 
 **This series**
 
-- [Post 1 — A Test Fidelity Ladder](post-1-fidelity-ladder.md)
-- `docs/code-snippets-per-post.md` — copy-paste snippets for Posts 2–7
+- [A Test Fidelity Ladder](post-1-fidelity-ladder.md) — series introduction
+- `docs/code-snippets-per-post.md` — copy-paste snippets for the series
 - `docs/multi-mode-functional-testing.md` — fixture architecture reference
 
 **eShop**
@@ -502,4 +500,4 @@ When InMemory passes but staging breaks on PostgreSQL semantics — pgvector, mi
 
 **Related NashTech posts**
 
-- [Integration Testing in .NET with Test Containers](https://blog.nashtechglobal.com/integration-testing-in-net-with-test-containers/) — PostgreSQL in Docker (Post 3 builds on this for eShop)
+- [Integration Testing in .NET with Test Containers](https://blog.nashtechglobal.com/integration-testing-in-net-with-test-containers/) — PostgreSQL in Docker (the [Testcontainers article](post-3-testcontainers.md) builds on this for the demo app)

@@ -21,7 +21,7 @@
 
 ## Table of Contents
 
-1. [First act: The dilemma](#1-first-act-the-dilemma)
+1. [The dilemma](#1-the-dilemma)
 2. [What is an API integration test?](#2-what-is-an-api-integration-test)
 3. [Stub, mock, fake — and why the word "mock" confuses everyone](#3-stub-mock-fake--and-why-the-word-mock-confuses-everyone)
 4. [The integration test host — real pipeline, swappable dependencies](#4-the-integration-test-host--real-pipeline-swappable-dependencies)
@@ -29,12 +29,12 @@
 6. [The test fidelity ladder](#6-the-test-fidelity-ladder)
 7. [Meet eShop — our demo application](#7-meet-eshop--our-demo-application)
 8. [How the series will work](#8-how-the-series-will-work)
-9. [Final act: Conclusion](#9-final-act-conclusion)
+9. [Conclusion](#9-conclusion)
 10. [References](#10-references)
 
 ---
 
-## 1. First act: The dilemma
+## 1. The dilemma
 
 Picture this: you ship a pull request for a Catalog API endpoint. Unit tests pass. You run integration tests locally — they pass too. CI is green. You merge.
 
@@ -213,7 +213,7 @@ We will use `WebApplicationFactory` in **every rung** — RepositoryMock, EF InM
 - whether Docker starts (Testcontainers / Aspire),
 - and whether messaging is no-op, spied, or backed by real RabbitMQ.
 
-Aspire mode is a hybrid: `WebApplicationFactory` still hosts the API under test, while a separate `DistributedApplication` provisions databases and other dependencies alongside the test. Post 5 goes deep on that split.
+Aspire mode is a hybrid: `WebApplicationFactory` still hosts the API under test, while a separate `DistributedApplication` provisions databases and other dependencies alongside the test. The [messaging article](post-5-messaging.md) goes deep on that split.
 
 For official documentation, see [Integration tests in ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/test/integration-tests).
 
@@ -323,22 +323,22 @@ Deeper fixture layout (session, lazy fixture per mode, mode-specific DI) lives i
 
 ## 8. How the series will work
 
-Each post builds on the last. You do not need Docker until Post 3.
+Each article builds on the last. You do not need Docker until the [Testcontainers article](post-3-testcontainers.md).
 
-| Post | Title | What you will learn |
-|------|-------|---------------------|
-| **1 (this post)** | A Test Fidelity Ladder | Concepts, vocabulary, eShop intro |
-| **2** | Repository Mock + EF InMemory | Bottom two ladder rungs — repository fake vs EF InMemory |
-| **3** | Testcontainers | Docker-backed dependencies; Postgres/pgvector case study |
-| **4** | Aspire in tests | Hybrid WAF + `DistributedApplication`, Identity.API, resource control |
-| **5** | EventBus & outbox | Spy bus vs real RabbitMQ, outbox assertions |
-| **6 (optional)** | Benchmarks | When to use which mode in CI |
+| Article | Topic | What you will learn |
+|---------|-------|---------------------|
+| **This article** | A Test Fidelity Ladder | Concepts, vocabulary, demo app intro |
+| **[Mock and InMemory](post-2-mock-and-inmemory.md)** | Repository mock + EF InMemory | Bottom two ladder rungs |
+| **[Testcontainers](post-3-testcontainers.md)** | Testcontainers | Docker-backed dependencies; Postgres/pgvector case study |
+| **[Aspire](post-4-aspire.md)** | Aspire in tests | Hybrid WAF + `DistributedApplication`, Identity.API, resource control |
+| **[Messaging](post-5-messaging.md)** | EventBus & outbox | Spy bus vs real RabbitMQ, outbox assertions |
+| **Benchmarks (optional)** | When to use which mode | CI strategy and timing |
 
 For broader introductions to Aspire and Testcontainers (beyond the testing angle), see [References](#10-references).
 
 ---
 
-## 9. Final act: Conclusion
+## 9. Conclusion
 
 Integration testing is not a binary choice between "all mocked" and "full production clone."
 
@@ -351,9 +351,7 @@ It is a ladder:
 
 Same API. Same tests. Different levels of reality.
 
-In the next post, we will build **sub-second Catalog API tests without Docker** — first with a repository fake, then with EF Core InMemory and the production repository — so you can choose the right no-Docker rung for the bug you are chasing.
-
-**Final question:** which rung is your team on today — and which rung does your next bug actually require?
+From here, the series climbs one rung at a time. The [next article](post-2-mock-and-inmemory.md) builds **sub-second Catalog API tests without Docker** — first with a repository fake, then with EF Core InMemory and the production repository.
 
 ---
 

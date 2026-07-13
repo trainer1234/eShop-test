@@ -32,12 +32,12 @@ Reuse the structure that works in the Playwright and Maestro articles:
 
 1. Hook + problem statement.
 2. A short **"What is X?"** box for readers with no prior knowledge (2–3 paragraphs max).
-3. Numbered sections/acts with a Table of Contents.
+3. Numbered sections with a Table of Contents.
 4. **Pros / cons / when-to-use** lists — honest, not just praise.
 5. A **"In Action"** section with real code from eShop.
 6. A **comparison table**.
 7. **References** at the end.
-8. A conclusion that ends with a memorable question.
+8. Conclusions end with a forward link or summary — no fixed closing question.
 
 ---
 
@@ -87,13 +87,15 @@ Publish in order. Each post stands alone but links forward and back.
 - **Draft:** see `docs/post-4-aspire.md`.
 
 ### Post 5 — Messaging & outbox (advanced)
-**Title:** *Testing EventBus and the Transactional Outbox in .NET — Spy Bus vs Real RabbitMQ*
-- What the transactional outbox is (plain language).
-- Why entry-assembly event discovery breaks under WAF, and the fix.
+**Title:** *Building API Integration Tests in .NET — Messaging, Outbox, and RabbitMQ on the Fidelity Ladder*
+- Message queue architecture primer (async, pub/sub, decoupling).
+- Publishing events with RabbitMQ (general pattern; demo for code); why test messaging; how messaging tests differ from API-only tests.
+- Transactional outbox (plain language).
 - Two messaging modes: `AspireMessagingOutbox` (CapturingEventBus) vs
   `AspireMessagingRabbitMq` (IntegrationEventCapture).
 - In Action: Catalog price change + Ordering create order.
-- Asserting outbox rows + published events.
+- Asserting outbox rows + published events; runsettings and traits.
+- **Draft:** see `docs/post-5-messaging.md`.
 
 ### Post 6 (optional) — Benchmark & CI strategy
 **Title:** *Benchmarking API Test Modes — Mock vs InMemory vs Testcontainers vs Aspire*

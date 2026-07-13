@@ -402,18 +402,6 @@ Production changes (`ICatalogRepository`, Serilog, event type discovery) exist *
 
 ---
 
-## Suggested Blog Post Sections
-
-1. **Problem:** Functional tests were Docker-only, slow, and hard to debug
-2. **Design:** Mode attribute + session + lazy fixture per mode
-3. **Implementation walkthrough:** Catalog fixture switch statement and DI configuration
-4. **Repository extraction:** Why Catalog.API needed `ICatalogRepository`
-5. **Messaging tests:** Outbox spy vs real RabbitMQ
-6. **Developer experience:** Runsettings, traits, live logging, HTTP traffic traces
-7. **Results:** Run mock tests locally in seconds; run Aspire tests in CI
-
----
-
 ## Ordering-Specific Notes
 
 `Ordering.FunctionalTests` mirrors the Catalog structure with service-specific mocks:
