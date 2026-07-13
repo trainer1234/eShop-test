@@ -504,37 +504,6 @@ dotnet test tests/Catalog.FunctionalTests --filter-trait FunctionalTestMode=aspi
 
 ---
 
-## Post 7 (optional) — Benchmark commands
-
-Run the same project with each runsettings and capture wall-clock time:
-
-```bash
-# Mock — baseline
-dotnet test tests/Catalog.FunctionalTests --settings eShop.FunctionalTests.RepositoryMock.runsettings --no-build
-
-# InMemory
-dotnet test tests/Catalog.FunctionalTests --settings eShop.FunctionalTests.EfCoreInMemory.runsettings --no-build
-
-# Testcontainers
-dotnet test tests/Catalog.FunctionalTests --settings eShop.FunctionalTests.Testcontainers.runsettings --no-build
-
-# Aspire
-dotnet test tests/Catalog.FunctionalTests --settings eShop.FunctionalTests.Aspire.runsettings --no-build
-```
-
-Suggested metrics to record in the blog post:
-
-| Mode | Cold start (first test class) | Warm run (subsequent) | Docker required |
-|------|------------------------------|------------------------|-----------------|
-| RepositoryMock | _TBD_ | _TBD_ | No |
-| EfCoreInMemory | _TBD_ | _TBD_ | No |
-| Testcontainers | _TBD_ | _TBD_ | Yes |
-| Aspire | _TBD_ | _TBD_ | Yes |
-
-Fill `_TBD_` with measurements from your machine and CI before publishing Post 7.
-
----
-
 ## Shared utilities (mention in any post)
 
 **Test logging** — `tests/Testing.Common/TestLogging.cs`:

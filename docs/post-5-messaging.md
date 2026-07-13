@@ -1,7 +1,7 @@
 # Post 5 Draft — Building API Integration Tests in .NET: Messaging, Outbox, and RabbitMQ on the Fidelity Ladder
 
 > **Status:** Draft for NashTech Blog  
-> **Series:** Post 5 of 5 (+ optional benchmark post)  
+> **Series:** Post 5 of 5  
 > **Demo project:** [trainer1234/eShop-test](https://github.com/trainer1234/eShop-test) (sample app with pluggable test modes)  
 > **Related:** `docs/post-4-aspire.md`, `docs/post-1-fidelity-ladder.md`, `docs/code-snippets-per-post.md`, `docs/multi-mode-functional-testing.md`
 
@@ -568,8 +568,7 @@ Messaging is the **side effect behind the HTTP response**. Earlier articles taug
 - **Messaging tests differ** because you assert outbox rows, bus behavior, and sometimes async delivery — not just status codes.
 - **Two modes** let you choose fidelity: a spy bus for speed, a real broker for realism — both on the [Aspire hybrid host](post-4-aspire.md).
 
-The optional benchmark article turns the ladder into a **CI strategy**: when to run fast modes on every PR, when to pay for Testcontainers, and when to schedule Aspire + messaging suites.
-
+Across the series, the practical workflow stays the same: use **Mock / InMemory** for the local loop, **Testcontainers** when you need real database semantics, and **Aspire (+ messaging)** when orchestration and broker fidelity matter.
 
 ---
 

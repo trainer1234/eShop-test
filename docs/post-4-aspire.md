@@ -1,7 +1,7 @@
 # Post 4 Draft — Building API Integration Tests in .NET: Aspire on the Fidelity Ladder
 
 > **Status:** Draft for NashTech Blog  
-> **Series:** Post 4 of 5 (+ optional benchmark post)  
+> **Series:** Post 4 of 5  
 > **Demo project:** [trainer1234/eShop-test](https://github.com/trainer1234/eShop-test) (eShop fork with pluggable test modes)  
 > **Related:** `docs/post-1-fidelity-ladder.md`, `docs/post-3-testcontainers.md`, `docs/code-snippets-per-post.md`, `docs/multi-mode-functional-testing.md`
 
@@ -158,7 +158,7 @@ This series implements **B** in the demo repo. **A** is the path to grow toward 
 
 ### Blind spots
 
-- **Slower cold start** than Testcontainers-only (~15–45 s vs ~10–30 s in eShop runs — measure on your hardware).
+- **Slower cold start** than Testcontainers-only (order of magnitude: tens of seconds vs a slightly lighter Docker-backed start).
 - **More packages** — `Aspire.Hosting`, hosting integrations, RabbitMQ hosting modules in test projects.
 - **Two Aspire stories** — readers may conflate full AppHost testing (A) with the eShop hybrid (B). Pick deliberately.
 

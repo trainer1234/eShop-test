@@ -1,7 +1,7 @@
 # Post 3 Draft — Building API Integration Tests in .NET: Testcontainers on the Fidelity Ladder
 
 > **Status:** Draft for NashTech Blog  
-> **Series:** Post 3 of 5 (+ optional benchmark post)  
+> **Series:** Post 3 of 5  
 > **Demo project:** [trainer1234/eShop-test](https://github.com/trainer1234/eShop-test) (eShop fork with pluggable test modes)  
 > **Related:** `docs/post-1-fidelity-ladder.md`, `docs/post-2-mock-and-inmemory.md`, `docs/code-snippets-per-post.md`, `docs/multi-mode-functional-testing.md`
 

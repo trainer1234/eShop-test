@@ -1,7 +1,7 @@
 # Post 2 Draft — Building API Integration Tests in .NET: Repository Mock and EF InMemory (The Bottom Two Rungs)
 
 > **Status:** Draft for NashTech Blog  
-> **Series:** Post 2 of 5 (+ optional benchmark post)  
+> **Series:** Post 2 of 5  
 > **Demo project:** [trainer1234/eShop-test](https://github.com/trainer1234/eShop-test) (eShop fork with pluggable test modes)  
 > **Related:** `docs/post-1-fidelity-ladder.md`, `docs/code-snippets-per-post.md`, `docs/multi-mode-functional-testing.md`
 
@@ -400,7 +400,7 @@ Run it twice — swap the attribute or runsettings file — and compare failure 
 | Pagination/filter LINQ in `CatalogRepository` | **EF Core InMemory** |
 | pgvector semantic search correctness | **[Testcontainers](post-3-testcontainers.md)** |
 | PR gate on a laptop without Docker | **Both** — Mock for breadth, InMemory for repository-heavy changes |
-| CI only runs containers | Still add Mock/InMemory targets for local dev; see optional benchmark post |
+| CI only runs containers | Still add Mock/InMemory targets for the local inner loop |
 
 ### Pros and cons
 

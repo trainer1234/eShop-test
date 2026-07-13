@@ -10,7 +10,7 @@
 
 **Theme:** Not "how to use X in isolation," but **how to choose and combine test modes on a
 real microservices application** — a *test fidelity ladder* running from Mock → EF Core
-InMemory → Testcontainers → Aspire, plus messaging/outbox testing and benchmarks.
+InMemory → Testcontainers → Aspire, plus messaging/outbox testing.
 
 ### What already exists on blog.nashtechglobal.com (do NOT repeat)
 
@@ -22,7 +22,7 @@ InMemory → Testcontainers → Aspire, plus messaging/outbox testing and benchm
 | [Playwright – An Introduction](https://blog.nashtechglobal.com/playwright-an-introduction/) | E2E UI framework intro | UI testing content |
 
 **Our differentiator:** microservices (Catalog + Ordering), pgvector semantic search,
-transactional outbox + RabbitMQ, and a *pluggable* mode architecture with benchmarks.
+transactional outbox + RabbitMQ, and a *pluggable* mode architecture.
 
 ---
 
@@ -41,7 +41,7 @@ Reuse the structure that works in the Playwright and Maestro articles:
 
 ---
 
-## The series (5 posts + 1 optional benchmark)
+## The series (5 posts)
 
 Publish in order. Each post stands alone but links forward and back.
 
@@ -83,7 +83,7 @@ Publish in order. Each post stands alone but links forward and back.
 - Two Aspire testing shapes: full AppHost (`DistributedApplicationTestingBuilder`) vs eShop hybrid (WAF + `DistributedApplication`).
 - In Action: `CatalogAspireTestHost`, `OrderingAspireTestHost`, health waits, Identity.API `AddProject`.
 - Managing resources before startup — optional deps, failure injection, chaos patterns ([Testing overview](https://aspire.dev/testing/overview/), [Advanced scenarios](https://aspire.dev/testing/advanced-scenarios/)).
-- Mode attribute + xUnit traits + `.runsettings`. Workflow: mock locally, Aspire in CI nightly.
+- Mode attribute + xUnit traits + `.runsettings`. Suggested workflow: mock locally, Aspire in CI nightly.
 - **Draft:** see `docs/post-4-aspire.md`.
 
 ### Post 5 — Messaging & outbox (advanced)
@@ -97,23 +97,9 @@ Publish in order. Each post stands alone but links forward and back.
 - Asserting outbox rows + published events; runsettings and traits.
 - **Draft:** see `docs/post-5-messaging.md`.
 
-### Post 6 (optional) — Benchmark & CI strategy
-**Title:** *Benchmarking API Test Modes — Mock vs InMemory vs Testcontainers vs Aspire*
-- Methodology: same suite, different `--settings` / traits.
-- Metrics: cold start, warm run, Docker pull, CI minutes.
-- Results table (publish real numbers).
-- Recommended matrix (below).
-- **Note:** run benchmarks before writing.
-
-```
-Local dev loop        → RepositoryMock / EfCoreInMemory
-PR validation         → RepositoryMock + a subset of Testcontainers
-Nightly / pre-release → Aspire (+ messaging modes)
-```
-
 ---
 
-## Reusable "Before you read" primer box (posts 2–6)
+## Reusable "Before you read" primer box (posts 2–5)
 
 | Term | One-line explanation |
 |------|----------------------|
@@ -153,7 +139,6 @@ References
 | 3 | Post 3 — Testcontainers | Medium | differentiate from Divyesh |
 | 4 | Post 4 — Aspire in tests | High | unique angle |
 | 5 | Post 5 — EventBus/outbox | High | messaging tests |
-| 6 | Post 6 — Benchmark (optional) | Medium | run measurements first |
 
 ---
 
@@ -168,7 +153,6 @@ References
 | `docs/post-4-aspire.md` | Post 4 full draft |
 | `docs/code-snippets-per-post.md` | Copy-paste-ready snippets per post |
 | Screenshots: Test Explorer traits, Aspire dashboard in a test run, Docker containers | Visual proof |
-| Benchmark script (`dotnet test` × 4 runsettings, timed) | Post 7 |
 | A GitHub branch/tag per post | Readers can check out matching code |
 
 ---

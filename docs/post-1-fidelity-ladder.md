@@ -1,7 +1,7 @@
 # Post 1 Draft — Building API Integration Tests in .NET: A Test Fidelity Ladder (Mock to Aspire)
 
 > **Status:** Draft for NashTech Blog  
-> **Series:** Post 1 of 5 (+ optional benchmark post)  
+> **Series:** Post 1 of 5  
 > **Demo project:** [trainer1234/eShop-test](https://github.com/trainer1234/eShop-test) (eShop fork with pluggable test modes)  
 > **Related:** `docs/blog-series-plan.md`, `docs/code-snippets-per-post.md`
 
@@ -332,7 +332,6 @@ Each article builds on the last. You do not need Docker until the [Testcontainer
 | **[Testcontainers](post-3-testcontainers.md)** | Testcontainers | Docker-backed dependencies; Postgres/pgvector case study |
 | **[Aspire](post-4-aspire.md)** | Aspire in tests | Hybrid WAF + `DistributedApplication`, Identity.API, resource control |
 | **[Messaging](post-5-messaging.md)** | EventBus & outbox | Spy bus vs real RabbitMQ, outbox assertions |
-| **Benchmarks (optional)** | When to use which mode | CI strategy and timing |
 
 For broader introductions to Aspire and Testcontainers (beyond the testing angle), see [References](#10-references).
 
